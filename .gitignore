@@ -1,0 +1,44 @@
+# Unity3D .gitignore file.
+#     Store this file at the root of your local repository.
+.DS_Store
+Library/BuildPlayer.prefs
+Library/BuildSettings.asset
+Library/AssetVersioning.db
+Library/AssetImportState
+Library/AssetServerCacheV3
+Library/FailedAssetImports.txt
+Library/ScriptAssemblies
+Library/ScriptMapper
+Library/assetDatabase3
+Library/cache
+Library/expandedItems
+Library/metadata
+Library/previews
+Library/guidmapper
+Temp
+*.csproj
+*.pidb
+*.sln
+build
+*.goutputstream*
+*.userprefs
+*~
+
+EditorUserBuildSettings.asset
+Library/InspectorExpandedItems.asset
+
+# auto regenerate files
+Assembly-CSharp-firstpass-vs.csproj
+Assembly-CSharp-firstpass.csroj
+Assembly-CSharp-vs.csproj
+Assembly-CSharp.csproj
+Assembly-UnityScript-vs.unityproj
+Assembly-UnityScript.unityproj
+Assembly-UnityScript-Editor.unityproj
+Assembly-UnityScript-Editor-vs.unityproj
+
+# app generate files
+conf-build.txt
+conf-build.txt.meta
+
+Assets/NGUI
