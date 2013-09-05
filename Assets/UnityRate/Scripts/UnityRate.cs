@@ -30,7 +30,7 @@ public class UnityRate {
 			return false;
 		}
 		
-		if (PlayerPrefs.GetString(prefsPrefixe+".ratedVersion", "") == version) {
+		if (PlayerPrefs.GetString(prefsPrefixe+".version", "") == version) {
 			if (debug) Debug.Log("UnityRate.Check rejected by already rated the version "+version);
 			return false;
 		}
@@ -44,15 +44,15 @@ public class UnityRate {
 			return false;
 		}
 		
-		var firstDateStr = PlayerPrefs.GetString(prefsPrefixe+".firstDate", "null");
-		if (firstDateStr == "null") {
+		var dateStr = PlayerPrefs.GetString(prefsPrefixe+".date", "null");
+		if (dateStr == "null") {
 			if (debug) Debug.Log("UnityRate.Check no firstdate found, setting it to now");
-			PlayerPrefs.SetString(prefsPrefixe+".firstDate", DateTime.Now.ToString("o"));
+			PlayerPrefs.SetString(prefsPrefixe+".date", DateTime.Now.ToString("o"));
 			return false;
 		}
 		
-		DateTime firstDate = DateTime.Parse(firstDateStr);
-		int days = (DateTime.Now - firstDate).Days;
+		DateTime date = DateTime.Parse(dateStr);
+		int days = (DateTime.Now - date).Days;
 		if (days < minDays) {
 			if (debug) Debug.Log("UnityRate.Check rejected by minDays of "+days);
 			return false;
@@ -65,14 +65,16 @@ public class UnityRate {
 	
 	public void RegisterUserRated() {
 		if (debug) Debug.Log("UnityRate.RegisterUserRated for version "+version);
-		PlayerPrefs.GetString(prefsPrefixe+".ratedVersion", version);
+		PlayerPrefs.SetString(prefsPrefixe+".version", version);
+		// set date as now so we give a calm time if the version is updated
+		PlayerPrefs.SetString(prefsPrefixe+".date", DateTime.Now.ToString("o"));
 	}
 	
 	public void AskLater() {
 		// change ask later to match the new date
 		var date = DateTime.Now.AddDays(askLaterDays - minDays);
 		if (debug) Debug.Log("UnityRate.AskLater to "+date);
-		PlayerPrefs.SetString(prefsPrefixe+".firstDate", date.ToString("o"));
+		PlayerPrefs.SetString(prefsPrefixe+".date", date.ToString("o"));
 	}
 	
 	public void DisableRate() {
@@ -110,14 +112,14 @@ public class UnityRate {
 	
 	public void Reset() {
 		if (debug) Debug.Log("UnityRate.Reset");
-		PlayerPrefs.DeleteKey(prefsPrefixe+".firstDate");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".date");
 		PlayerPrefs.DeleteKey(prefsPrefixe+".disabled");
 		PlayerPrefs.DeleteKey(prefsPrefixe+".count");
-		PlayerPrefs.DeleteKey(prefsPrefixe+".ratedVersion");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".version");
 	}
 	
 	public void SetFirstDate(DateTime date) {
 		if (debug) Debug.Log("UnityRate.SetFirstDate to "+date);
-		PlayerPrefs.SetString(prefsPrefixe+".firstDate", date.ToString("o"));
+		PlayerPrefs.SetString(prefsPrefixe+".date", date.ToString("o"));
 	}
 }
