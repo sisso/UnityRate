@@ -4,8 +4,6 @@ void UnityRate_sendToRate(unsigned char* id)
 	NSLog(@"UnityRate_sendToRate id '%@'", idStr);
 	
 	// http://gamesfromwithin.com/increase-your-app-ratings-on-the-app-store
-	NSString* version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-	[defaults setValue:version forKey:KeyReviewed];
 	// http://creativealgorithms.com/blog/content/review-app-links-sorted-out
 	// http://bjango.com/articles/ituneslinks/
 	// NSString* url = [NSString stringWithFormat:  @"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=1&type=Purple+Software&mt=8", appid];
