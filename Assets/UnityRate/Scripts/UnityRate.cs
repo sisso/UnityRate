@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 public class UnityRate {
@@ -8,19 +9,83 @@ public class UnityRate {
 	
 	private string appId = "undefinedAppId";
 	
+	public bool debug = false;
+	
+	public int minCount = 15;
+	
+	public int minDays = 15;
+	
+	public int askLaterDays = 7;
+	
+	public string version = "undefinedVersion";
+	
 #if UNITY_IPHONE
 	[DllImport("__Internal", CharSet = CharSet.Ansi)]
     private static extern void UnityRate_sendToRate([In, MarshalAs(UnmanagedType.LPStr)]string id);
 #endif
 	
-	public void IncreaseCount() {
-		var amount = int.Parse(PlayerPrefs.GetString(prefsPrefixe+".count", "0"));
-		PlayerPrefs.SetString(prefsPrefixe+".count", (amount+1).ToString());
+	public bool Check() {
+		if (PlayerPrefs.GetString(prefsPrefixe+".disabled", "false") == "true") {
+			if (debug) Debug.Log("UnityRate.Check rejected by disabled");
+			return false;
+		}
+		
+		if (PlayerPrefs.GetString(prefsPrefixe+".ratedVersion", "") == version) {
+			if (debug) Debug.Log("UnityRate.Check rejected by already rated the version "+version);
+			return false;
+		}
+		
+		var count = int.Parse(PlayerPrefs.GetString(prefsPrefixe+".count", "0")) + 1;
+		if (debug) Debug.Log("UnityRate.Check increasing count to "+count);
+		PlayerPrefs.SetString(prefsPrefixe+".count", count.ToString());
+		
+		if (count < minCount) {
+			if (debug) Debug.Log("UnityRate.Check rejected by minCount of "+count);
+			return false;
+		}
+		
+		var firstDateStr = PlayerPrefs.GetString(prefsPrefixe+".firstDate", "null");
+		if (firstDateStr == "null") {
+			if (debug) Debug.Log("UnityRate.Check no firstdate found, setting it to now");
+			PlayerPrefs.SetString(prefsPrefixe+".firstDate", DateTime.Now.ToString("o"));
+			return false;
+		}
+		
+		DateTime firstDate = DateTime.Parse(firstDateStr);
+		int days = (DateTime.Now - firstDate).Days;
+		if (days < minDays) {
+			if (debug) Debug.Log("UnityRate.Check rejected by minDays of "+days);
+			return false;
+		}
+
+		if (debug) Debug.Log("UnityRate.Check success");
+		
+		return true;
+	}
+	
+	public void RegisterUserRated() {
+		if (debug) Debug.Log("UnityRate.RegisterUserRated for version "+version);
+		PlayerPrefs.GetString(prefsPrefixe+".ratedVersion", version);
+	}
+	
+	public void AskLater() {
+		// change ask later to match the new date
+		var date = DateTime.Now.AddDays(askLaterDays - minDays);
+		if (debug) Debug.Log("UnityRate.AskLater to "+date);
+		PlayerPrefs.SetString(prefsPrefixe+".firstDate", date.ToString("o"));
+	}
+	
+	public void DisableRate() {
+		if (debug) Debug.Log("UnityRate.DisableRate");
+		PlayerPrefs.SetString(prefsPrefixe+".disabled", "true");
 	}
 	
 	public void SendToRating() {
-		Debug.Log("SendToRating.started");
-#if UNITY_ANDROID		
+		if (debug) Debug.Log("SendToRating.started");
+#if UNITY_EDITOR 
+		// fake it
+		Debug.Log("Fake rating...");
+#elif UNITY_ANDROID		
 		AndroidJavaClass appClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject activity = appClass.GetStatic<AndroidJavaObject>("currentActivity");
 		
@@ -37,6 +102,22 @@ public class UnityRate {
 #elif UNITY_IPHONE
 		UnityRate_sendToRate(appId);
 #endif
-		Debug.Log("SendToRating.finished");
+		
+		RegisterUserRated();
+		
+		if (debug) Debug.Log("SendToRating.finished");
+	}
+	
+	public void Reset() {
+		if (debug) Debug.Log("UnityRate.Reset");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".firstDate");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".disabled");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".count");
+		PlayerPrefs.DeleteKey(prefsPrefixe+".ratedVersion");
+	}
+	
+	public void SetFirstDate(DateTime date) {
+		if (debug) Debug.Log("UnityRate.SetFirstDate to "+date);
+		PlayerPrefs.SetString(prefsPrefixe+".firstDate", date.ToString("o"));
 	}
 }
