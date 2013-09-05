@@ -6,7 +6,12 @@ using System.Runtime.InteropServices;
 public class UnityRate {
 	private string prefsPrefixe = "unityrate";
 	
-	private string appName = "undefinedAppName";
+	private string appId = "undefinedAppId";
+	
+#if UNITY_IPHONE
+	[DllImport("__Internal", CharSet = CharSet.Ansi)]
+    private static extern void UnityRate_sendToRate([In, MarshalAs(UnmanagedType.LPStr)]string id);
+#endif
 	
 	public void IncreaseCount() {
 		var amount = int.Parse(PlayerPrefs.GetString(prefsPrefixe+".count", "0"));
@@ -21,7 +26,7 @@ public class UnityRate {
 		
 		// uri = Uri.parse("market://details?id=" + APP_PNAME)
 		AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-		AndroidJavaObject uri = uriClass.CallStatic<AndroidJavaObject>("parse", "market://details?id=" + appName);
+		AndroidJavaObject uri = uriClass.CallStatic<AndroidJavaObject>("parse", "market://details?id=" + appId);
 		
 		// intent = new Intent(Intent.ACTION_VIEW, uri)
 		AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
@@ -29,6 +34,8 @@ public class UnityRate {
 		
 		// activity.startActivity(intent);
 		activity.Call("startActivity", intent);
+#elif UNITY_IPHONE
+		UnityRate_sendToRate(appId);
 #endif
 		Debug.Log("SendToRating.finished");
 	}
