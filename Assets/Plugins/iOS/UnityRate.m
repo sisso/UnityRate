@@ -1,15 +1,14 @@
 void UnityRate_sendToRate(unsigned char* id)
 {
 	NSString *idStr = [NSString stringWithUTF8String:id];
-	NSLog(@"UnityRate_sendToRate id '%@'", idStr);
 	
-	// http://gamesfromwithin.com/increase-your-app-ratings-on-the-app-store
-	// http://creativealgorithms.com/blog/content/review-app-links-sorted-out
-	// http://bjango.com/articles/ituneslinks/
-	// NSString* url = [NSString stringWithFormat:  @"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=1&type=Purple+Software&mt=8", appid];
+	// http://stackoverflow.com/questions/18905686/itunes-review-url-and-ios-7-ask-user-to-rate-our-app-appstore-show-a-blank-pag
+	NSString* const iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%@";
+	NSString* const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@"
 
-	NSString *templateUrl = @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@";
-	NSString* iTunesLink = [NSString stringWithFormat: templateUrl, idStr];
-
+	BOOL isIos7 = [[UIDevice currentDevice].systemVersion floatValue] >= 7.0f;	
+	NSString* urlFormat = isIos7 ? iOS7AppStoreURLFormat : iOSAppStoreURLFormat;
+	NSString* iTunesLink = [NSString stringWithFormat: urlFormat, idStr]; 
+	NSLog(@"UnityRate_sendToRate open url '%@'", iTunesLink);
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:iTunesLink]];
 }
