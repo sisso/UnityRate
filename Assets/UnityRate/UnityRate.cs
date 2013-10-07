@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 public class UnityRate {
 	private string prefsPrefixe = "unityrate";
 	
-	private string appId = "undefinedAppId";
+	public string appId = "undefinedAppId";
 	
 	public bool debug = false;
 	

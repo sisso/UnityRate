@@ -14,6 +14,7 @@ public class UnityRateTestGui : MonoBehaviour {
 		GUILayout.Label(msg);
 		if (GUILayout.Button("Create", GUILayout.Height(h))) {
 			rate = new UnityRate();
+			rate.appId = "write your app id";
 			rate.version = version.ToString();
 			rate.debug = true;
 			msg = "Created";
